@@ -2,15 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AR Models Placement</title>
+  <title>AR Cube on Tap</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="importmap">
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/examples/jsm/loaders/GLTFLoader.js": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js",
-        "three/examples/jsm/webxr/ARButton.js": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/webxr/ARButton.js",
-        "three/examples/jsm/utils/SkeletonUtils.js": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/utils/SkeletonUtils.js"
+        "three/examples/jsm/webxr/ARButton.js": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/webxr/ARButton.js"
       }
     }
   </script>
@@ -21,13 +19,10 @@
 <body>
 <script type="module">
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
-import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 let camera, scene, renderer;
 let controller, reticle;
-let model = null;
 let hitTestSource = null;
 let hitTestSourceRequested = false;
 
@@ -37,6 +32,7 @@ animate();
 function init() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+
   scene.add(new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1));
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -57,23 +53,15 @@ function init() {
 
   controller = renderer.xr.getController(0);
   controller.addEventListener('select', () => {
-    if (reticle.visible && model) {
-      const modelClone = clone(model);
-      modelClone.position.setFromMatrixPosition(reticle.matrix);
-      modelClone.scale.set(0.5, 0.5, 0.5);
-      scene.add(modelClone);
+    if (reticle.visible) {
+      const cubeGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+      const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x0077ff });
+      const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+      cube.position.setFromMatrixPosition(reticle.matrix);
+      scene.add(cube);
     }
   });
   scene.add(controller);
-
-  // Load GLB model
-  const loader = new GLTFLoader();
-  loader.load('https://sketchfab.com/3d-models/polar-bear-deeb7f4add9f4c36abaacdb73ce3e553', gltf => {
-    model = gltf.scene;
-    model.visible = false; // Don't add it until cloned
-  }, undefined, error => {
-    console.error('Failed to load model:', error);
-  });
 
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
