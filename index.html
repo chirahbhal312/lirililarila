@@ -68,7 +68,7 @@ function init() {
 
   // Load GLB model
   const loader = new GLTFLoader();
-  loader.load('./tiger.glb', gltf => {
+  loader.load('https://sketchfab.com/3d-models/polar-bear-deeb7f4add9f4c36abaacdb73ce3e553', gltf => {
     model = gltf.scene;
     model.visible = false; // Don't add it until cloned
   }, undefined, error => {
