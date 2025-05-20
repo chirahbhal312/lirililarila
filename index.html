@@ -68,7 +68,7 @@ function init() {
 
   // Load GLB model
   const loader = new GLTFLoader();
-  loader.load('tiger.glb', gltf => {
+  loader.load('./tiger.glb', gltf => {
     model = gltf.scene;
     model.visible = false; // Don't add it until cloned
   }, undefined, error => {
